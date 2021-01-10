@@ -11,7 +11,7 @@ class Character:
         if self.hp <= 0:
             self.die()
 
-    def ist_dead(self):
+    def is_dead(self):
         return self.hp <= 0
 
     def die(self):
@@ -25,7 +25,7 @@ class Ork(Character):
     def __init__(self):
         Character.__init__(self,300,30,"Ork")
 
-class Player:
+class Player(Character):
     def __init__(self,name,hp ,ad):
         Character.__init__(self,hp,ad,name)
         self.max_hp = hp
@@ -68,10 +68,10 @@ class Map:
             self.state.append(fields)
 
     def print_state(self):
-        self.state[self.x][self.y].print_state
+        self.state[self.x][self.y].print_state()
 
     def get_enemies(self):
-        self.state[self.x][self.y].enemies
+        return self.state[self.x][self.y].enemies
 
     def forward(self):
         if self.x == len(self.state) - 1:
@@ -122,7 +122,14 @@ def backwards(p,m):
     m.backwards()
 
 def fight(p,m):
-    pass
+    enemies = m.get_enemies()
+    while len(enemies) > 0:
+        enemies[0].get_hit(p.ad)
+        if enemies[0].is_dead():
+            enemies.remove(enemies[0])
+        for i in enemies:
+            p.get_hit(i.ad)
+        print("You are wounded and haven " + str(p.hp) + " hp left.")
 
 def save(p,m):
     pass
@@ -151,7 +158,7 @@ if  __name__ =='__main__':
     print("*"*20 + "Textadventure" + "*"*20)
     name = input("Enter your name: ")
 
-    p = Player(name,200,20)
+    p = Player(name,200,100)
     mmap = Map(5,5)
     print("(type help to list all available commands)\n")
 
@@ -161,4 +168,4 @@ if  __name__ =='__main__':
             Commands[command[0]](p, mmap)
         else:
             print("You run around in circles and don't know what to do...")
-            mmap.print_state()
+        mmap.print_state()
